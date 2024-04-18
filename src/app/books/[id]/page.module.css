@@ -1,0 +1,19 @@
+.page {
+  padding: 2rem;
+}
+
+.book {
+  margin: 1rem 0;
+  padding: 2rem;
+  border: 1px solid black;
+}
+
+.form > * {
+  display: block;
+}
+
+.form > button,
+.form > input {
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+}

@@ -1,95 +1,54 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import { fetchAllBooks } from "@/api-calls"
+import s from "./page.module.css"
+import Link from "next/link"
+import FilterBooksForm from "./filter-books-form"
+import { isSortBy } from "@/types"
 
-export default function Home() {
+export default async function HomePage({
+  searchParams: { nameSearch, sortBy },
+}: {
+  searchParams: { sortBy?: string; nameSearch?: string }
+}) {
+  const books = await fetchAllBooks(isSortBy(sortBy) ? sortBy : null)
+  const bugFreeBooks = books.filter((b) => typeof b.id === "string")
+  let filteredBooks = bugFreeBooks
+  if (nameSearch != null) {
+    filteredBooks = bugFreeBooks.filter((book) =>
+      book.name.toLowerCase().includes(nameSearch.toLowerCase())
+    )
+  }
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+    <main className={s.main}>
+      <h1>Books</h1>
+      <FilterBooksForm />
+      <ul>
+        {filteredBooks.map((book) => (
+          <li className={s.book} key={book.id}>
+            <Link href={`/books/${book.id}`}>
+              <p>
+                <strong>name:</strong> {book.name}
+              </p>
+              <p>
+                <strong>genre:</strong> {book.genre}
+              </p>
+              <p>
+                <strong>averageRating:</strong>{" "}
+                {Math.round(book.averageRating * 100) / 100}
+              </p>
+              <p>
+                <strong>haveRead:</strong> {book.haveRead}
+              </p>
+              <p>
+                <strong>currentlyReading:</strong> {book.currentlyReading}
+              </p>
+              <p>
+                <strong>userRating:</strong> {book.userRating || "--"}
+              </p>
+            </Link>
+          </li>
+        ))}
+      </ul>
     </main>
-  );
+  )
 }
